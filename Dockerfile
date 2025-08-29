@@ -12,8 +12,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Make start script executable
+RUN chmod +x start.sh
+
 # Expose port
 EXPOSE 5000
 
-# Simple start with immediate response
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app_simple:app", "--workers", "1", "--timeout", "120"]
+# Use the start script
+CMD ["./start.sh"]

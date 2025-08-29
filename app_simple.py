@@ -68,5 +68,6 @@ import threading
 threading.Thread(target=load_real_data, daemon=True).start()
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", "5000"))
+    print(f"Starting app on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
