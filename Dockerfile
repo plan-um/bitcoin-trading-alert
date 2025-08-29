@@ -17,5 +17,9 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Run the application
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} dashboard_with_status:app --workers 1 --timeout 120
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} dashboard_with_status:app --workers 1 --timeout 120 --preload

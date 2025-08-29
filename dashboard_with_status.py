@@ -329,6 +329,11 @@ def index():
     """메인 대시보드 페이지"""
     return render_template('dashboard_final.html')
 
+@app.route('/health')
+def health():
+    """헬스체크 엔드포인트"""
+    return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
+
 @app.route('/api/data')
 def get_data():
     """현재 데이터 API"""
@@ -385,24 +390,26 @@ def update_single_data():
     except Exception as e:
         print(f"❌ 데이터 수집 실패: {e}")
 
+# 초기 데이터 로드 (모듈 로드 시 실행)
+if os.path.exists('dashboard_data.json'):
+    try:
+        with open('dashboard_data.json', 'r') as f:
+            latest_data = json.load(f)
+        print("기존 데이터 파일 로드 성공")
+    except:
+        print("기존 데이터 파일 로드 실패, 새로 시작합니다.")
+        latest_data = {}
+else:
+    latest_data = {}
+
+# 백그라운드 업데이트 스레드 시작
+update_thread = threading.Thread(target=update_data, daemon=True)
+update_thread.start()
+
 if __name__ == '__main__':
-    # 초기 데이터 로드
-    if os.path.exists('dashboard_data.json'):
-        try:
-            with open('dashboard_data.json', 'r') as f:
-                latest_data = json.load(f)
-            print("기존 데이터 파일 로드 성공")
-        except:
-            print("기존 데이터 파일 로드 실패, 새로 시작합니다.")
-            latest_data = {}
-    
     # 초기 데이터 업데이트
     print("초기 데이터 수집 중...")
     update_single_data()
-    
-    # 백그라운드 업데이트 시작
-    update_thread = threading.Thread(target=update_data, daemon=True)
-    update_thread.start()
     
     print("="*60)
     print("🚀 비트코인 투자 전략 대시보드 (상태 모니터링 포함)")
