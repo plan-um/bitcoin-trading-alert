@@ -22,7 +22,6 @@ instance/
 
 # Project specific
 *.log
-*.json
 dashboard_data.json
 bitcoin_status.json
 bitcoin_strategy_status.json
