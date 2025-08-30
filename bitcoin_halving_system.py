@@ -586,7 +586,14 @@ class BitcoinHalvingStrategy:
     @property
     def halving_dates(self) -> Dict[int, str]:
         """반감기 날짜 딕셔너리 반환 (문자열 형태)"""
-        return {h['number']: h['date'].isoformat() for h in self.halvings}
+        result = {}
+        for h in self.halvings:
+            date_obj = h['date']
+            if isinstance(date_obj, datetime):
+                result[h['number']] = date_obj.isoformat()
+            else:
+                result[h['number']] = str(date_obj)
+        return result
     
     def get_action_recommendation(self, scores: Dict) -> Dict:
         """종합 점수 기반 행동 권고"""

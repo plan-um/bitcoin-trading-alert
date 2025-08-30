@@ -245,7 +245,7 @@ def update_data():
                     'score': halving_score,
                     'weight': halving_weight * 100,
                     'recommendation': halving_data['recommendation'],
-                    'next_halving': system.halving_dates.get(5, None)  # 5차 반감기 (다음 반감기)
+                    'next_halving': str(system.halving_dates.get(5, '')) if system.halving_dates.get(5) else None  # 5차 반감기 (다음 반감기)
                 },
                 'heat': {
                     'score': heat_score,
