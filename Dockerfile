@@ -2,15 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy requirements first for better caching
+# Install requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy app
 COPY . .
 
-# Set environment variable default
-ENV PORT=5000
+# Default port
+ENV PORT=8080
 
-# Use the railway app with explicit Python
-CMD ["python", "railway_app.py"]
+# Run server
+CMD ["python", "server.py"]
