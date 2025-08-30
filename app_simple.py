@@ -7,6 +7,7 @@ from flask_cors import CORS
 import os
 import json
 from datetime import datetime
+from werkzeug.serving import run_simple
 
 app = Flask(__name__)
 CORS(app)
@@ -68,6 +69,16 @@ import threading
 threading.Thread(target=load_real_data, daemon=True).start()
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", "5000"))
-    print(f"Starting app on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # Railway PORT 처리
+    port_str = os.environ.get("PORT", "5000")
+    try:
+        port = int(port_str)
+    except (ValueError, TypeError):
+        print(f"Invalid PORT value: {port_str}, using default 5000")
+        port = 5000
+    
+    print(f"Starting Flask app on port {port}")
+    print(f"Environment PORT: {os.environ.get('PORT', 'not set')}")
+    
+    # 직접 Flask 서버 실행 (production에서는 gunicorn 사용)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
