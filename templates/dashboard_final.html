@@ -861,7 +861,15 @@
                         <i data-lucide="line-chart"></i>
                         <span data-lang="chartTitle">Historical Trends</span>
                     </div>
-                    <div class="card-description" data-lang="chartDesc">Score progression over time</div>
+                    <div class="card-description">
+                        <span data-lang="chartDesc">Score progression over time</span>
+                        <select id="timeRange" class="btn btn-sm btn-outline" style="float: right; padding: 0.25rem 0.5rem; font-size: 0.75rem; margin-top: -5px;">
+                            <option value="hour" data-lang="timeHour">Hour</option>
+                            <option value="day" data-lang="timeDay" selected>Day</option>
+                            <option value="week" data-lang="timeWeek">Week</option>
+                            <option value="month" data-lang="timeMonth">Month</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="chart-container">
@@ -933,6 +941,10 @@
                 accDesc: "Market accumulation indicators",
                 chartTitle: "Historical Trends",
                 chartDesc: "Score progression over time",
+                timeHour: "Hour",
+                timeDay: "Day",
+                timeWeek: "Week",
+                timeMonth: "Month",
                 statusTitle: "Data Source Status",
                 statusDesc: "API health monitoring",
                 piCycle: "Pi Cycle Top (30%)",
@@ -1077,8 +1089,8 @@
             'long_term_holder': 'https://www.lookintobitcoin.com/charts/hodl-waves/'
         };
         
-        // Initialize
-        let currentLang = 'en';
+        // Initialize - Load saved language preference
+        let currentLang = localStorage.getItem('dashboardLang') || 'en';
         let isDarkMode = false;
         let chart = null;
         
@@ -1100,6 +1112,71 @@
             },
             ko: {
                 'price_usd': 'USD 가격',
+                'price_krw': 'KRW 가격',
+                'pi_cycle': 'Pi 사이클 탑',
+                'nupl': 'NUPL',
+                'rsi': 'RSI',
+                'google_trends': '구글 트렌드',
+                'fear_greed': '공포 탐욕 지수',
+                'exchange_balance': '거래소 잔고',
+                'long_term_holder': '장기 보유자'
+            }
+        };
+        
+        // Korean translations
+        translations.ko = {
+            title: "비트코인 전략 대시보드",
+            guide: "가이드",
+            theme: "다크",
+            refresh: "새로고침",
+            priceTitle: "비트코인 가격",
+            priceDesc: "실시간 시장 데이터",
+            kimchiLabel: "김치 프리미엄",
+            halvingTitle: "반감기 사이클",
+            halvingDesc: "비트코인 반감기 사이클 분석",
+            halvingRecommendation: "추천",
+            heatTitle: "과열도 점수",
+            sellSignal: "매도 신호",
+            heatDesc: "시장 과열 지표",
+            accTitle: "축적도 점수",
+            buySignal: "매수 신호",
+            accDesc: "시장 축적 지표",
+            chartTitle: "과거 추세",
+            chartDesc: "시간별 점수 변화",
+            timeHour: "시간",
+            timeDay: "일",
+            timeWeek: "주",
+            timeMonth: "월",
+            statusTitle: "데이터 소스 상태",
+            statusDesc: "API 상태 모니터링",
+            piCycle: "Pi 사이클 탑 (30%)",
+            nupl: "NUPL > 0.75 (25%)",
+            rsi: "RSI 주간 > 85 (20%)",
+            trends: "구글 트렌드 (15%)",
+            kimchi: "김치 > 10% (10%)",
+            fearGreed: "공포 탐욕 < 30 (40%)",
+            exchange: "거래소 잔고 ↓ (35%)",
+            longTerm: "장기 보유자 (25%)",
+            halving: "반감기 윈도우 (보너스)",
+            guideModalTitle: "트레이딩 전략 가이드",
+            guideContent: `
+                <div class="guide-section">
+                    <h3>과열도 점수 (매도 신호)</h3>
+                    <p>70점 이상: 강한 매도 신호</p>
+                    <p>50-70점: 주의 구간</p>
+                    <p>30-50점: 중립</p>
+                </div>
+                <div class="guide-section">
+                    <h3>축적도 점수 (매수 신호)</h3>
+                    <p>70점 이상: 강한 매수 신호</p>
+                    <p>50-70점: 관심 구간</p>
+                    <p>30-50점: 대기</p>
+                </div>
+            `
+        };
+        
+        // Status names for Korean
+        statusNames.ko = {
                 'price_krw': 'KRW 가격',
                 'pi_cycle': '파이 사이클 탑',
                 'nupl': 'NUPL',
@@ -1125,18 +1202,28 @@
                 if (diff < 60) return '방금 전';
                 if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
                 if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+                if (diff < 604800) return `${Math.floor(diff / 86400)}일 전`;
             } else {
                 if (diff < 60) return 'Just now';
                 if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
                 if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+                if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
             }
             return date.toLocaleDateString(currentLang === 'ko' ? 'ko-KR' : 'en-US');
         }
         
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'ko' : 'en';
+            localStorage.setItem('dashboardLang', currentLang); // Save language preference
             document.getElementById('langToggle').textContent = currentLang === 'en' ? '한국어' : 'English';
             updateLanguage();
+            // Force immediate update
+            setTimeout(() => {
+                updateLanguage();
+                if (window.lastData) {
+                    updateDashboard(window.lastData);
+                }
+            }, 10);
         }
         
         function updateLanguage() {
@@ -1147,10 +1234,26 @@
                 }
             });
             
+            // Update time range selector options
+            const timeRangeSelect = document.getElementById('timeRange');
+            if (timeRangeSelect) {
+                timeRangeSelect.querySelectorAll('option').forEach(option => {
+                    const key = option.getAttribute('data-lang');
+                    if (key && translations[currentLang][key]) {
+                        option.textContent = translations[currentLang][key];
+                    }
+                });
+            }
+            
             // Update guide content
             const guideContent = document.getElementById('guideContent');
             if (guideContent) {
                 guideContent.innerHTML = translations[currentLang].guideContent;
+            }
+            
+            // Re-update status monitor if data exists
+            if (window.lastDataStatus) {
+                updateStatusMonitor(window.lastDataStatus);
             }
         }
         
@@ -1206,7 +1309,7 @@
                         <span class="status-name">${statusNames[currentLang][key] || key}</span>
                         <div class="status-dot ${freshness}"></div>
                     </div>
-                    <div class="status-time">${formatTime(status?.last_update)}</div>
+                    <div class="status-time">${status?.last_update ? formatTime(status.last_update) : (currentLang === 'ko' ? '데이터 없음' : 'No data')}</div>
                     ${link ? `<div class="status-link"><span>${currentLang === 'ko' ? '데이터 확인' : 'View Data'}</span> <i data-lucide="external-link" style="width: 12px; height: 12px;"></i></div>` : ''}
                 `;
                 
@@ -1219,6 +1322,10 @@
         
         function updateDashboard(data) {
             if (!data || !data.prices) return;
+            
+            // Store last data for language switch
+            window.lastData = data;
+            window.lastDataStatus = data.data_status;
             
             // Update time
             const updateText = currentLang === 'ko' ? '마지막 업데이트: ' : 'Last update: ';
@@ -1344,7 +1451,34 @@
             
             const ctx = document.getElementById('historyChart').getContext('2d');
             
-            const labels = history.map(h => new Date(h.timestamp).toLocaleTimeString(currentLang === 'ko' ? 'ko-KR' : 'en-US'));
+            // Get selected time range
+            const timeRange = document.getElementById('timeRange')?.value || 'day';
+            
+            // Format labels based on time range
+            const labels = history.map(h => {
+                const date = new Date(h.timestamp);
+                let format = {};
+                
+                switch(timeRange) {
+                    case 'hour':
+                        format = { hour: '2-digit', minute: '2-digit' };
+                        break;
+                    case 'day':
+                        format = { month: 'short', day: 'numeric', hour: '2-digit' };
+                        break;
+                    case 'week':
+                        format = { month: 'short', day: 'numeric' };
+                        break;
+                    case 'month':
+                        format = { year: 'numeric', month: 'short', day: 'numeric' };
+                        break;
+                    default:
+                        format = { hour: '2-digit', minute: '2-digit' };
+                }
+                
+                return date.toLocaleString(currentLang === 'ko' ? 'ko-KR' : 'en-US', format);
+            });
+            
             const heatData = history.map(h => h.heat_score);
             const accData = history.map(h => h.acc_score);
             
@@ -1445,6 +1579,26 @@
         // Initial load
         fetchData();
         updateLanguage();
+        
+        // Set initial language button text
+        if (document.getElementById('langToggle')) {
+            document.getElementById('langToggle').textContent = currentLang === 'en' ? '한국어' : 'English';
+        }
+        
+        // Add time range selector event listener
+        const timeRangeSelect = document.getElementById('timeRange');
+        if (timeRangeSelect) {
+            timeRangeSelect.addEventListener('change', async function() {
+                const range = this.value;
+                try {
+                    const response = await fetch(`/api/history?range=${range}`);
+                    const history = await response.json();
+                    updateChart(history);
+                } catch (error) {
+                    console.error('Failed to fetch history:', error);
+                }
+            });
+        }
         
         // Auto refresh every 30 seconds
         setInterval(fetchData, 30000);
