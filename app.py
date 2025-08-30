@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, jsonify
 from flask_cors import CORS
 
@@ -29,5 +30,18 @@ def refresh_data():
     return jsonify({"status": "refreshing"})
 
 if __name__ == '__main__':
-    # 8080 포트 고정
-    app.run(host='0.0.0.0', port=8080)
+    # Railway의 PORT 처리
+    port = None
+    port_env = os.environ.get('PORT', '')
+    
+    # PORT가 '$PORT' 문자열이거나 비어있으면 8080 사용
+    if port_env == '$PORT' or port_env == '${PORT}' or not port_env:
+        port = 8080
+    else:
+        try:
+            port = int(port_env)
+        except:
+            port = 8080
+    
+    print(f"Starting on port: {port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
