@@ -24,9 +24,17 @@ def load_dashboard_data():
         
         # JSON 파일에서 데이터 로드
         if os.path.exists('dashboard_data.json'):
-            with open('dashboard_data.json', 'r') as f:
-                latest_data = json.load(f)
-                print("Dashboard data loaded successfully")
+            try:
+                with open('dashboard_data.json', 'r') as f:
+                    content = f.read()
+                    if content.strip():  # 파일이 비어있지 않은 경우
+                        latest_data = json.loads(content)
+                        print("Dashboard data loaded successfully")
+                    else:
+                        print("Dashboard data file is empty")
+            except (json.JSONDecodeError, Exception) as e:
+                print(f"Error loading dashboard data: {e}")
+                latest_data = {}
         
         # 백그라운드 업데이트 시작
         from dashboard_with_status import update_thread

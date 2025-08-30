@@ -245,7 +245,7 @@ def update_data():
                     'score': halving_score,
                     'weight': halving_weight * 100,
                     'recommendation': halving_data['recommendation'],
-                    'next_halving': str(system.halving_dates.get(5, '')) if system.halving_dates.get(5) else None  # 5차 반감기 (다음 반감기)
+                    'next_halving': system.halving_dates.get(5, None)  # 5차 반감기 (다음 반감기)
                 },
                 'heat': {
                     'score': heat_score,
@@ -311,9 +311,9 @@ def update_data():
             if len(historical_data) > 100:
                 historical_data = historical_data[-100:]
             
-            # 파일 저장
+            # 파일 저장 - datetime 객체 처리를 위한 커스텀 encoder 사용
             with open('dashboard_data.json', 'w') as f:
-                json.dump(latest_data, f, indent=2)
+                json.dump(latest_data, f, indent=2, default=str)
             
             print(f"✅ 업데이트 완료: BTC ${btc_usd:,.0f}, 과열도 {heat_score:.1f}%, 축적도 {acc_score:.1f}%")
             
