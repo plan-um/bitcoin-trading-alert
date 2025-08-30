@@ -1,7 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-
-[[services]]
-name = "web"
-internalPort = 8080
-externalPort = 8080
