@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Bitcoin Strategy Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .logo .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .bitcoin-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .login-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .google-btn {
+            background: #4285f4;
+        }
+        
+        .google-btn:hover {
+            background: #357ae8;
+        }
+        
+        .kakao-btn {
+            background: #fee500;
+            color: #000000;
+        }
+        
+        .kakao-btn:hover {
+            background: #fdd835;
+        }
+        
+        .divider {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #999;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .features {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .features h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .feature-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .feature-item::before {
+            content: '✓';
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .kakao-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="bitcoin-icon">₿</div>
+            <h1>Bitcoin Strategy Dashboard</h1>
+            <div class="subtitle">AI 기반 비트코인 투자 전략 분석</div>
+        </div>
+        
+        <div id="errorMessage" class="error-message">
+            로그인에 실패했습니다. 다시 시도해주세요.
+        </div>
+        
+        <div class="login-methods">
+            <a href="/auth/google" class="login-btn google-btn">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#ffffff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#ffffff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#ffffff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Google로 로그인
+            </a>
+            
+            <a href="/auth/kakao" class="login-btn kakao-btn">
+                <svg class="kakao-icon" viewBox="0 0 24 24">
+                    <path fill="#000000" d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 0 1-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3zm5.907 8.06l1.47-1.424a.472.472 0 0 0-.656-.678l-1.928 1.866V9.282a.472.472 0 0 0-.944 0v2.557a.471.471 0 0 0 0 .222V13.5a.472.472 0 0 0 .944 0v-1.363l.427-.413 1.428 2.033a.472.472 0 1 0 .773-.543l-1.514-2.155zm-2.958 1.924h-1.46V9.297a.472.472 0 0 0-.943 0v4.159c0 .26.21.472.471.472h1.932a.472.472 0 1 0 0-.944zm-5.857-1.092l.696-1.707.638 1.707H9.092zm2.523.488l.002-.016a.469.469 0 0 0-.127-.32l-1.046-2.8a.69.69 0 0 0-.627-.474.696.696 0 0 0-.653.447l-1.661 4.075a.472.472 0 0 0 .874.357l.33-.813h2.07l.299.8a.472.472 0 1 0 .884-.33l-.345-.926zM8.293 9.302a.472.472 0 0 0-.471-.472H4.577a.472.472 0 1 0 0 .944h1.16v3.736a.472.472 0 0 0 .944 0V9.774h1.14c.261 0 .472-.212.472-.472z"/>
+                </svg>
+                카카오로 로그인
+            </a>
+        </div>
+        
+        <div class="divider">
+            <span>간편 로그인</span>
+        </div>
+        
+        <div class="features">
+            <h3>주요 기능</h3>
+            <div class="feature-list">
+                <div class="feature-item">실시간 비트코인 가격 모니터링</div>
+                <div class="feature-item">AI 기반 매수/매도 신호 분석</div>
+                <div class="feature-item">과열도 및 축적도 지표</div>
+                <div class="feature-item">반감기 사이클 분석</div>
+                <div class="feature-item">김치 프리미엄 추적</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check for error parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        
+        if (error) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.classList.add('show');
+            
+            // Customize error message based on error type
+            if (error === 'google_auth_failed') {
+                errorMessage.textContent = 'Google 로그인에 실패했습니다. 다시 시도해주세요.';
+            } else if (error === 'kakao_auth_failed') {
+                errorMessage.textContent = '카카오 로그인에 실패했습니다. 다시 시도해주세요.';
+            }
+            
+            // Remove error parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
+</body>
+</html>

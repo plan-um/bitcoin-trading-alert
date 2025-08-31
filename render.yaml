@@ -1,0 +1,23 @@
+services:
+  # Web Service for Bitcoin Trading Alert Dashboard
+  - type: web
+    name: bitcoin-trading-alert
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app_with_auth:app --bind 0.0.0.0:$PORT --timeout 120 --workers 2
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    autoDeploy: true
+    healthCheckPath: /health
+    
+# You need to add these environment variables in Render Dashboard:
+# - FLASK_SECRET_KEY
+# - GOOGLE_CLIENT_ID
+# - GOOGLE_CLIENT_SECRET
+# - KAKAO_CLIENT_ID
+# - REDIRECT_URI_BASE (should be https://your-app.onrender.com)
