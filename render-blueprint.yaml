@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: bitcoin-trading-alert
+    runtime: python
+    repo: https://github.com/plan-um/bitcoin-trading-alert
+    branch: main
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app_with_auth:app --bind 0.0.0.0:$PORT --timeout 120 --workers 2
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: 10000
+      # OAuth keys는 배포 후 Render 대시보드에서 직접 설정 필요
+      # - key: GOOGLE_CLIENT_ID
+      #   value: your-google-client-id
+      # - key: GOOGLE_CLIENT_SECRET
+      #   value: your-google-secret
+      # - key: KAKAO_CLIENT_ID
+      #   value: your-kakao-api-key
+      # - key: REDIRECT_URI_BASE
+      #   value: https://bitcoin-trading-alert.onrender.com
