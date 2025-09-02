@@ -29,6 +29,13 @@ Session(app)
 # Initialize authentication
 auth_manager = AuthManager(app)
 
+# Optional auth bypass for staging/demo
+# Set DISABLE_AUTH=true in env to allow access without login
+AUTH_DISABLED = os.getenv('DISABLE_AUTH', '').lower() in ('1', 'true', 'yes')
+def _no_auth(f):
+    return f
+maybe_protect = _no_auth if AUTH_DISABLED else auth_manager.login_required
+
 # 전역 데이터
 latest_data = {}
 historical_data = []
@@ -102,7 +109,7 @@ def kakao_callback():
     return auth_manager.kakao_callback()
 
 @app.route('/')
-@auth_manager.login_required
+@maybe_protect
 def index():
     """Main dashboard (requires login)"""
     return render_template('dashboard_final.html')
@@ -113,14 +120,14 @@ def health():
     return jsonify({"status": "healthy"})
 
 @app.route('/api/user')
-@auth_manager.login_required
+@maybe_protect
 def get_user():
     """Get current user info"""
     user_info = auth_manager.get_current_user_info()
     return jsonify(user_info)
 
 @app.route('/api/data')
-@auth_manager.login_required
+@maybe_protect
 def get_data():
     """Get dashboard data (requires login)"""
     if latest_data:
@@ -128,7 +135,7 @@ def get_data():
     return jsonify({"status": "loading", "message": "Data is being loaded..."})
 
 @app.route('/api/history')
-@auth_manager.login_required
+@maybe_protect
 def get_history():
     """Get historical data (requires login)"""
     # Handle time range parameter
@@ -146,7 +153,7 @@ def get_status():
     return jsonify({"status": "ok"})
 
 @app.route('/api/refresh')
-@auth_manager.login_required
+@maybe_protect
 def refresh_data():
     """Refresh dashboard data (requires login)"""
     try:
