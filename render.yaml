@@ -10,8 +10,6 @@ services:
         value: 3.11.0
       - key: FLASK_ENV
         value: production
-      - key: PORT
-        value: 10000
     autoDeploy: true
     healthCheckPath: /health
     

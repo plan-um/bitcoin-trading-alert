@@ -16,8 +16,6 @@ services:
         value: production
       - key: FLASK_SECRET_KEY
         generateValue: true
-      - key: PORT
-        value: 10000
       # OAuth keys는 배포 후 Render 대시보드에서 직접 설정 필요
       # - key: GOOGLE_CLIENT_ID
       #   value: your-google-client-id
