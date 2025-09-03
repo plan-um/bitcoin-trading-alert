@@ -129,23 +129,44 @@ def get_user():
 @app.route('/api/data')
 @maybe_protect
 def get_data():
-    """Get dashboard data (requires login)"""
+    """Get dashboard data (requires login if auth enabled)
+    우선 모듈의 실시간 데이터를 참조하고, 없으면 로컬 파일/로컬 캐시를 반환."""
+    try:
+        # 1) 대시보드 모듈에서 직접 최신 데이터 참조
+        from dashboard_with_status import latest_data as ds_latest
+        if isinstance(ds_latest, dict) and ds_latest:
+            return jsonify(ds_latest)
+    except Exception:
+        pass
+
+    # 2) 로컬 캐시가 있으면 반환
     if latest_data:
         return jsonify(latest_data)
+
+    # 3) 파일에서 시도
+    try:
+        if os.path.exists('dashboard_data.json'):
+            with open('dashboard_data.json', 'r') as f:
+                content = f.read().strip()
+                if content:
+                    return jsonify(json.loads(content))
+    except Exception:
+        pass
+
     return jsonify({"status": "loading", "message": "Data is being loaded..."})
 
 @app.route('/api/history')
 @maybe_protect
 def get_history():
-    """Get historical data (requires login)"""
-    # Handle time range parameter
-    time_range = request.args.get('range', 'day')
-    
-    # Filter historical data based on time range
-    # This is a placeholder - implement actual filtering logic
-    filtered_data = historical_data
-    
-    return jsonify(filtered_data)
+    """Get historical data (requires login if auth enabled)"""
+    try:
+        from dashboard_with_status import historical_data as ds_hist
+        if isinstance(ds_hist, list) and ds_hist:
+            return jsonify(ds_hist)
+    except Exception:
+        pass
+
+    return jsonify(historical_data)
 
 @app.route('/api/status')
 def get_status():
