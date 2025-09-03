@@ -1175,18 +1175,7 @@
             `
         };
         
-        // Status names for Korean
-        statusNames.ko = {
-                'price_krw': 'KRW 가격',
-                'pi_cycle': '파이 사이클 탑',
-                'nupl': 'NUPL',
-                'rsi': 'RSI',
-                'google_trends': '구글 트렌드',
-                'fear_greed': '공포탐욕지수',
-                'exchange_balance': '거래소 잔고',
-                'long_term_holder': '장기 보유자'
-            }
-        };
+        // Status names for Korean (이미 위에서 정의됨)
         
         function formatNumber(num) {
             return new Intl.NumberFormat(currentLang === 'ko' ? 'ko-KR' : 'en-US').format(Math.round(num));
