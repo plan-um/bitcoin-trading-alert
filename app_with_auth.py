@@ -36,6 +36,17 @@ def _no_auth(f):
     return f
 maybe_protect = _no_auth if AUTH_DISABLED else auth_manager.login_required
 
+# Disable caching for dynamic pages/APIs to avoid stale UI
+@app.after_request
+def add_no_cache_headers(response):
+    try:
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    except Exception:
+        pass
+    return response
+
 # 전역 데이터
 latest_data = {}
 historical_data = []
